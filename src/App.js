@@ -1,5 +1,7 @@
 import React, { Component } from "react";
 import { cloneDeep } from "lodash";
+import { Button, Segment } from "semantic-ui-react";
+
 import Board from "./components/Board";
 import * as game from "./game";
 
@@ -41,7 +43,7 @@ class App extends Component {
       // AI move logic
       if (ai && !hasWon && moves < game.ROWS * game.COLS) {
         const { nextRow, nextCol } = game.nextMove({
-          grid: grid,
+          grid,
           player,
           hard,
           moves
@@ -67,45 +69,51 @@ class App extends Component {
       <div style={appStyle}>
         <h1>{winMessage}</h1>
         <Board rows={grid} onClick={this.handleClick} />
-        <div className="ui vertical segment">
-          <button
-            className="ui inverted button primary"
+        <Segment vertical>
+          <Button
+            inverted
+            color="primary"
             onClick={() => this.setState(cloneDeep(game.INITIAL_STATE))}
           >
             New Game
-          </button>
-          <button
-            className={`ui inverted button ${ai ? "active" : ""}`}
+          </Button>
+          <Button
+            inverted
+            active={ai}
             onClick={() => {
               game.INITIAL_STATE["ai"] = !game.INITIAL_STATE["ai"];
               this.setState({ ai: !ai });
             }}
           >
             AI
-          </button>
-        </div>
-        <div className={`ui vertical segment ${ai ? "" : "hidden"}`}>
-          <div className="ui buttons">
-            <button
-              className={`ui button inverted green ${hard ? "" : "active"}`}
+          </Button>
+        </Segment>
+        <Segment vertical className={ai ? "" : "hidden"}>
+          <Button.Group>
+            <Button
+              inverted
+              color="green"
+              active={!hard}
               onClick={() => {
                 game.INITIAL_STATE["hard"] = false;
                 this.setState({ hard: false });
               }}
             >
               Easy
-            </button>
-            <button
-              className={`ui button inverted red ${hard ? "active" : ""}`}
+            </Button>
+            <Button
+              inverted
+              color="red"
+              active={hard}
               onClick={() => {
                 game.INITIAL_STATE["hard"] = true;
                 this.setState({ hard: true });
               }}
             >
               Hard
-            </button>
-          </div>
-        </div>
+            </Button>
+          </Button.Group>
+        </Segment>
       </div>
     );
   }
