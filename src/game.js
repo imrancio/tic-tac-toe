@@ -12,7 +12,8 @@ export const INITIAL_STATE = {
   winMessage: "Tic Tac Toe", // doubles as title
   ai: false,
   moves: 0,
-  hard: false
+  hard: false,
+  history: []
 };
 // win conditions for 3x3 grid
 const winConditions = [

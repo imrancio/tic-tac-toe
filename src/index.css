@@ -18,3 +18,7 @@ code {
 .hidden {
   display: none;
 }
+
+.invisible {
+  visibility: hidden;
+}

@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 import { cloneDeep } from "lodash";
-import { Button, Segment } from "semantic-ui-react";
+import { Button, Segment, Icon } from "semantic-ui-react";
 
 import Board from "./components/Board";
 import * as game from "./game";
@@ -17,13 +17,14 @@ class App extends Component {
     const nextPlayer = game.getOpponent(player);
     clone[rowIndex][colIndex] = player;
     const hasWon = game.checkWin({ grid: clone, player });
-    const { winMessage } = this.state;
+    const { winMessage, history } = this.state;
     this.setState({
       grid: clone,
       player: nextPlayer,
       moves: moves + 1,
       hasWon,
-      winMessage: hasWon ? `Player ${player} has won!` : winMessage
+      winMessage: hasWon ? `Player ${player} has won!` : winMessage,
+      history: history.concat([this.state]) // cache state
     });
     // return new state for ai
     return { grid: clone, player: nextPlayer, moves: moves + 1, hasWon };
@@ -63,13 +64,26 @@ class App extends Component {
     }
   };
 
+  undo = () => {
+    const { history } = this.state;
+    this.setState(cloneDeep(history.pop()));
+  };
+
   render() {
-    const { grid, winMessage, ai, hard } = this.state;
+    const { grid, winMessage, ai, hard, history } = this.state;
     return (
       <div style={appStyle}>
         <h1>{winMessage}</h1>
         <Board rows={grid} onClick={this.handleClick} />
         <Segment vertical>
+          <Button
+            inverted
+            icon
+            disabled={history.length === 0}
+            onClick={() => this.undo()}
+          >
+            <Icon name="undo" />
+          </Button>
           <Button
             inverted
             color="primary"
