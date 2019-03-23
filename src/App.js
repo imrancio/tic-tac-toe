@@ -1,135 +1,20 @@
 import React, { Component } from "react";
-import { cloneDeep, minBy, maxBy } from "lodash";
+import { cloneDeep } from "lodash";
 import Board from "./components/Board";
-
-const ROWS = 3;
-const COLS = 3;
-const ROW_ARR = new Array(ROWS).fill("");
-const COL_ARR = new Array(COLS).fill("");
-const GRID = ROW_ARR.map(x => COL_ARR.slice());
-const INITIAL_STATE = {
-  player: "X",
-  grid: cloneDeep(GRID),
-  hasWon: false,
-  winMessage: "Tic Tac Toe", // doubles as title
-  ai: false,
-  moves: 0,
-  hard: false
-};
-// win conditions for 3x3 grid
-const winConditions = [
-  [[0, 0], [0, 1], [0, 2]],
-  [[1, 0], [1, 1], [1, 2]],
-  [[2, 0], [2, 1], [2, 2]],
-  [[0, 0], [1, 0], [2, 0]],
-  [[0, 1], [1, 1], [2, 1]],
-  [[0, 2], [1, 2], [2, 2]],
-  [[0, 0], [1, 1], [2, 2]],
-  [[0, 2], [1, 1], [2, 0]]
-];
+import * as game from "./game";
 
 const appStyle = {
   textAlign: "center"
 };
 
-// get opponent player
-const getOpponent = player => (player === "X" ? "O" : "X");
-
-// get random integer in range [0-max)
-const getRandomInt = max => Math.floor(Math.random() * Math.floor(max));
-
-// check win condition
-const checkWin = ({ grid, player }) => {
-  const playerInGrid = ([row, col]) => {
-    return grid[row][col] && grid[row][col] === player;
-  };
-
-  for (let i = 0; i < winConditions.length; i++) {
-    if (winConditions[i].every(playerInGrid)) {
-      return true;
-    }
-  }
-
-  return false;
-};
-
-// minimax algorithm
-const miniMax = ({ grid, depth, player, maxPlayer, moves }) => {
-  // maximising player (ai) won
-  if (checkWin({ grid, player: maxPlayer })) {
-    return 10 - depth;
-    // minimising player (human) won
-  } else if (checkWin({ grid, player: getOpponent(maxPlayer) })) {
-    return depth - 10;
-    // tie
-  } else if (moves >= ROWS * COLS) {
-    return 0;
-  }
-  // empty space(s) left on grid
-  const branches = [];
-  for (let i = 0; i < ROWS; i++) {
-    for (let j = 0; j < COLS; j++) {
-      if (grid[i][j]) continue;
-      // branch grid
-      grid[i][j] = player;
-      // recursive lookahead
-      const branch = miniMax({
-        grid,
-        depth: depth + 1,
-        player: getOpponent(player),
-        maxPlayer,
-        moves: moves + 1
-      });
-      branches.push({ cost: branch, cell: { nextRow: i, nextCol: j } });
-      // cleanup branched grid
-      grid[i][j] = "";
-    }
-  }
-  // max player turn
-  if (player === maxPlayer) {
-    const max = maxBy(branches, v => v.cost);
-    if (depth === 0) {
-      return max.cell;
-    } else {
-      return max.cost;
-    }
-    // min player turn
-  } else {
-    const min = minBy(branches, v => v.cost);
-    if (depth === 0) {
-      return min.cell;
-    } else {
-      return min.cost;
-    }
-  }
-};
-
-// pick next row/col for ai move
-const nextMove = ({ grid, player, hard, moves }) => {
-  // easy ai
-  if (!hard) {
-    // pick random empty cell
-    let nextRow = getRandomInt(ROWS);
-    let nextCol = getRandomInt(COLS);
-    while (grid[nextRow][nextCol]) {
-      nextRow = getRandomInt(ROWS);
-      nextCol = getRandomInt(COLS);
-    }
-    return { nextRow, nextCol };
-    // unbeatable ai
-  } else {
-    return miniMax({ grid, depth: 0, player, maxPlayer: player, moves });
-  }
-};
-
 class App extends Component {
-  state = cloneDeep(INITIAL_STATE);
+  state = cloneDeep(game.INITIAL_STATE);
 
   makeMove = ({ rowIndex, colIndex, grid, player, moves }) => {
     const clone = cloneDeep(grid);
-    const nextPlayer = getOpponent(player);
+    const nextPlayer = game.getOpponent(player);
     clone[rowIndex][colIndex] = player;
-    const hasWon = checkWin({ grid: clone, player });
+    const hasWon = game.checkWin({ grid: clone, player });
     const { winMessage } = this.state;
     this.setState({
       grid: clone,
@@ -154,8 +39,8 @@ class App extends Component {
         moves: this.state.moves
       });
       // AI move logic
-      if (ai && !hasWon && moves < ROWS * COLS) {
-        const { nextRow, nextCol } = nextMove({
+      if (ai && !hasWon && moves < game.ROWS * game.COLS) {
+        const { nextRow, nextCol } = game.nextMove({
           grid: grid,
           player,
           hard,
@@ -170,7 +55,7 @@ class App extends Component {
         });
       }
       // game tied
-      if (!hasWon && totalMoves === ROWS * COLS - 1) {
+      if (!hasWon && totalMoves === game.ROWS * game.COLS - 1) {
         this.setState({ winMessage: "Tie!" });
       }
     }
@@ -185,14 +70,14 @@ class App extends Component {
         <div className="ui vertical segment">
           <button
             className="ui inverted button primary"
-            onClick={() => this.setState(cloneDeep(INITIAL_STATE))}
+            onClick={() => this.setState(cloneDeep(game.INITIAL_STATE))}
           >
             New Game
           </button>
           <button
             className={`ui inverted button ${ai ? "active" : ""}`}
             onClick={() => {
-              INITIAL_STATE["ai"] = !INITIAL_STATE["ai"];
+              game.INITIAL_STATE["ai"] = !game.INITIAL_STATE["ai"];
               this.setState({ ai: !ai });
             }}
           >
@@ -204,7 +89,7 @@ class App extends Component {
             <button
               className={`ui button inverted green ${hard ? "" : "active"}`}
               onClick={() => {
-                INITIAL_STATE["hard"] = false;
+                game.INITIAL_STATE["hard"] = false;
                 this.setState({ hard: false });
               }}
             >
@@ -213,7 +98,7 @@ class App extends Component {
             <button
               className={`ui button inverted red ${hard ? "active" : ""}`}
               onClick={() => {
-                INITIAL_STATE["hard"] = true;
+                game.INITIAL_STATE["hard"] = true;
                 this.setState({ hard: true });
               }}
             >
