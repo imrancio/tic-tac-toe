@@ -119,7 +119,7 @@ export const nextMove = ({ grid, player, difficulty, moves }) => {
       return miniMax({
         grid,
         depth: 0,
-        maxDepth: 2,
+        maxDepth: 5,
         player,
         maxPlayer: player,
         moves
