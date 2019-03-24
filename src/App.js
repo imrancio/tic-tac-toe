@@ -31,7 +31,7 @@ class App extends Component {
   };
 
   handleClick = ({ rowIndex, colIndex }) => {
-    const { ai, hasWon: gameOver, hard, moves: totalMoves } = this.state;
+    const { ai, hasWon: gameOver, difficulty, moves: totalMoves } = this.state;
     if (!gameOver) {
       // Player move logic
       const { grid, player, moves, hasWon } = this.makeMove({
@@ -46,7 +46,7 @@ class App extends Component {
         const { nextRow, nextCol } = game.nextMove({
           grid,
           player,
-          hard,
+          difficulty,
           moves
         });
         this.makeMove({
@@ -64,13 +64,8 @@ class App extends Component {
     }
   };
 
-  undo = () => {
-    const { history } = this.state;
-    this.setState(cloneDeep(history.pop()));
-  };
-
   render() {
-    const { grid, winMessage, ai, hard, history } = this.state;
+    const { grid, winMessage, ai, difficulty, history } = this.state;
     return (
       <div style={appStyle}>
         <h1>{winMessage}</h1>
@@ -80,13 +75,13 @@ class App extends Component {
             inverted
             icon
             disabled={history.length === 0}
-            onClick={() => this.undo()}
+            onClick={() => this.setState(cloneDeep(history.pop()))}
           >
             <Icon name="undo" />
           </Button>
           <Button
             inverted
-            color="primary"
+            color="blue"
             onClick={() => this.setState(cloneDeep(game.INITIAL_STATE))}
           >
             New Game
@@ -107,21 +102,32 @@ class App extends Component {
             <Button
               inverted
               color="green"
-              active={!hard}
+              active={difficulty === 0}
               onClick={() => {
-                game.INITIAL_STATE["hard"] = false;
-                this.setState({ hard: false });
+                game.INITIAL_STATE["difficulty"] = 0;
+                this.setState({ difficulty: 0 });
               }}
             >
               Easy
             </Button>
             <Button
               inverted
-              color="red"
-              active={hard}
+              color="orange"
+              active={difficulty === 1}
               onClick={() => {
-                game.INITIAL_STATE["hard"] = true;
-                this.setState({ hard: true });
+                game.INITIAL_STATE["difficulty"] = 1;
+                this.setState({ difficulty: 1 });
+              }}
+            >
+              Medium
+            </Button>
+            <Button
+              inverted
+              color="red"
+              active={difficulty === 2}
+              onClick={() => {
+                game.INITIAL_STATE["difficulty"] = 2;
+                this.setState({ difficulty: 2 });
               }}
             >
               Hard

@@ -12,7 +12,7 @@ export const INITIAL_STATE = {
   winMessage: "Tic Tac Toe", // doubles as title
   ai: false,
   moves: 0,
-  hard: false,
+  difficulty: 0,
   history: []
 };
 // win conditions for 3x3 grid
@@ -48,16 +48,16 @@ export const checkWin = ({ grid, player }) => {
   return false;
 };
 
-// minimax algorithm
-const miniMax = ({ grid, depth, player, maxPlayer, moves }) => {
+// minimax algorithm (depth-limited)
+const miniMax = ({ grid, depth, maxDepth, player, maxPlayer, moves }) => {
   // maximising player (ai) won
   if (checkWin({ grid, player: maxPlayer })) {
     return 10 - depth;
     // minimising player (human) won
   } else if (checkWin({ grid, player: getOpponent(maxPlayer) })) {
     return depth - 10;
-    // tie
-  } else if (moves >= ROWS * COLS) {
+    // tie (or max depth)
+  } else if (depth >= maxDepth || moves >= ROWS * COLS) {
     return 0;
   }
   // empty space(s) left on grid
@@ -71,6 +71,7 @@ const miniMax = ({ grid, depth, player, maxPlayer, moves }) => {
       const branch = miniMax({
         grid,
         depth: depth + 1,
+        maxDepth,
         player: getOpponent(player),
         maxPlayer,
         moves: moves + 1
@@ -100,19 +101,41 @@ const miniMax = ({ grid, depth, player, maxPlayer, moves }) => {
 };
 
 // pick next row/col for ai move
-export const nextMove = ({ grid, player, hard, moves }) => {
-  // easy ai
-  if (!hard) {
-    // pick random empty cell
-    let nextRow = getRandomInt(ROWS);
-    let nextCol = getRandomInt(COLS);
-    while (grid[nextRow][nextCol]) {
-      nextRow = getRandomInt(ROWS);
-      nextCol = getRandomInt(COLS);
-    }
-    return { nextRow, nextCol };
+export const nextMove = ({ grid, player, difficulty, moves }) => {
+  switch (difficulty) {
+    // easy ai
+    case 0:
+      // pick random empty cell
+      let nextRow = getRandomInt(ROWS);
+      let nextCol = getRandomInt(COLS);
+      while (grid[nextRow][nextCol]) {
+        nextRow = getRandomInt(ROWS);
+        nextCol = getRandomInt(COLS);
+      }
+      return { nextRow, nextCol };
+    // medium ai
+    case 1:
+      // lookahead 2 moves
+      return miniMax({
+        grid,
+        depth: 0,
+        maxDepth: 2,
+        player,
+        maxPlayer: player,
+        moves
+      });
     // unbeatable ai
-  } else {
-    return miniMax({ grid, depth: 0, player, maxPlayer: player, moves });
+    case 2:
+      // lookahead all moves
+      return miniMax({
+        grid,
+        depth: 0,
+        maxDepth: 9,
+        player,
+        maxPlayer: player,
+        moves
+      });
+    default:
+      return null;
   }
 };
