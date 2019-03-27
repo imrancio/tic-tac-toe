@@ -10,6 +10,12 @@ const appStyle = {
   textAlign: "center"
 };
 
+const difficulties = [
+  { val: 0, colour: "green", name: "Easy" },
+  { val: 1, colour: "orange", name: "Medium" },
+  { val: 2, colour: "red", name: "Hard" }
+];
+
 class App extends Component {
   state = cloneDeep(game.INITIAL_STATE);
 
@@ -33,16 +39,16 @@ class App extends Component {
 
   changePlayer = () => {
     const { player } = this.state;
-    game.INITIAL_STATE["player"] = game.getOpponent(player);
+    game.INITIAL_STATE.player = game.getOpponent(player);
     this.setState({ player: game.getOpponent(player) });
   };
 
   changeColour = (player, colour) => {
     if (player === "X") {
-      game.INITIAL_STATE["xColour"] = colour;
+      game.INITIAL_STATE.xColour = colour;
       this.setState({ xColour: colour });
     } else {
-      game.INITIAL_STATE["oColour"] = colour;
+      game.INITIAL_STATE.oColour = colour;
       this.setState({ oColour: colour });
     }
   };
@@ -122,7 +128,7 @@ class App extends Component {
             inverted
             active={ai}
             onClick={() => {
-              game.INITIAL_STATE["ai"] = !game.INITIAL_STATE["ai"];
+              game.INITIAL_STATE.ai = !game.INITIAL_STATE.ai;
               this.setState({ ai: !ai });
             }}
           >
@@ -137,39 +143,20 @@ class App extends Component {
         </Segment>
         <Segment vertical className={ai ? "" : "hidden"}>
           <Button.Group>
-            <Button
-              inverted
-              color="green"
-              active={difficulty === 0}
-              onClick={() => {
-                game.INITIAL_STATE["difficulty"] = 0;
-                this.setState({ difficulty: 0 });
-              }}
-            >
-              Easy
-            </Button>
-            <Button
-              inverted
-              color="orange"
-              active={difficulty === 1}
-              onClick={() => {
-                game.INITIAL_STATE["difficulty"] = 1;
-                this.setState({ difficulty: 1 });
-              }}
-            >
-              Medium
-            </Button>
-            <Button
-              inverted
-              color="red"
-              active={difficulty === 2}
-              onClick={() => {
-                game.INITIAL_STATE["difficulty"] = 2;
-                this.setState({ difficulty: 2 });
-              }}
-            >
-              Hard
-            </Button>
+            {difficulties.map((diff, i) => (
+              <Button
+                key={i}
+                inverted
+                color={diff.colour}
+                active={difficulty === diff.val}
+                onClick={() => {
+                  game.INITIAL_STATE.difficulty = diff.val;
+                  this.setState({ difficulty: diff.val });
+                }}
+              >
+                {diff.name}
+              </Button>
+            ))}
           </Button.Group>
         </Segment>
       </div>
