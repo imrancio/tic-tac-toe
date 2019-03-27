@@ -13,7 +13,9 @@ export const INITIAL_STATE = {
   ai: false,
   moves: 0,
   difficulty: 0,
-  history: []
+  history: [],
+  xColour: "blue",
+  oColour: "red"
 };
 // win conditions for 3x3 grid
 const winConditions = [
@@ -115,7 +117,7 @@ export const nextMove = ({ grid, player, difficulty, moves }) => {
       return { nextRow, nextCol };
     // medium ai
     case 1:
-      // lookahead 2 moves
+      // lookahead 5 moves
       return miniMax({
         grid,
         depth: 0,

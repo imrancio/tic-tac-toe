@@ -6,7 +6,15 @@ const rowStyle = {
   justifyContent: "center"
 };
 
-const Row = ({ cells, firstRow, lastRow, onClick, rowIndex }) => (
+const Row = ({
+  cells,
+  firstRow,
+  lastRow,
+  onClick,
+  rowIndex,
+  xColour,
+  oColour
+}) => (
   <div style={rowStyle}>
     {cells.map((col, i) => (
       <Cell
@@ -19,6 +27,8 @@ const Row = ({ cells, firstRow, lastRow, onClick, rowIndex }) => (
         lastCol={i === cells.length - 1}
         onClick={onClick}
         player={col}
+        xColour={xColour}
+        oColour={oColour}
       />
     ))}
   </div>

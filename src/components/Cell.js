@@ -1,4 +1,5 @@
 import React from "react";
+import * as colours from "../colours";
 
 const defaultBorder = "1px solid white";
 const size = 8; // rem
@@ -11,7 +12,9 @@ const Cell = ({
   onClick,
   colIndex,
   rowIndex,
-  player
+  player,
+  xColour,
+  oColour
 }) => {
   const cellStyle = {
     borderLeft: firstCol ? "none" : defaultBorder,
@@ -24,7 +27,8 @@ const Cell = ({
     justifyContent: "center",
     alignItems: "center",
     fontSize: `${size * 0.5}rem`,
-    color: player === "X" ? "#0E6EB8" : "#FE9A76"
+    color:
+      player === "X" ? colours.inverted[xColour] : colours.inverted[oColour]
   };
   const indexes = { colIndex, rowIndex };
   return (

@@ -1,8 +1,9 @@
 import React, { Component } from "react";
 import { cloneDeep } from "lodash";
-import { Button, Segment, Icon } from "semantic-ui-react";
+import { Header, Button, Segment } from "semantic-ui-react";
 
 import Board from "./components/Board";
+import Settings from "./components/Settings";
 import * as game from "./game";
 
 const appStyle = {
@@ -28,6 +29,22 @@ class App extends Component {
     });
     // return new state for ai
     return { grid: clone, player: nextPlayer, moves: moves + 1, hasWon };
+  };
+
+  changePlayer = () => {
+    const { player } = this.state;
+    game.INITIAL_STATE["player"] = game.getOpponent(player);
+    this.setState({ player: game.getOpponent(player) });
+  };
+
+  changeColour = (player, colour) => {
+    if (player === "X") {
+      game.INITIAL_STATE["xColour"] = colour;
+      this.setState({ xColour: colour });
+    } else {
+      game.INITIAL_STATE["oColour"] = colour;
+      this.setState({ oColour: colour });
+    }
   };
 
   handleClick = ({ rowIndex, colIndex }) => {
@@ -65,20 +82,35 @@ class App extends Component {
   };
 
   render() {
-    const { grid, winMessage, ai, difficulty, history } = this.state;
+    const {
+      grid,
+      winMessage,
+      ai,
+      difficulty,
+      history,
+      player,
+      xColour,
+      oColour
+    } = this.state;
+    const colour = player === "X" ? xColour : oColour;
     return (
       <div style={appStyle}>
-        <h1>{winMessage}</h1>
-        <Board rows={grid} onClick={this.handleClick} />
+        <Header as="h1" inverted>
+          {winMessage}
+        </Header>
+        <Board
+          rows={grid}
+          onClick={this.handleClick}
+          xColour={xColour}
+          oColour={oColour}
+        />
         <Segment vertical>
           <Button
             inverted
-            icon
+            icon="undo"
             disabled={history.length === 0}
             onClick={() => this.setState(cloneDeep(history.pop()))}
-          >
-            <Icon name="undo" />
-          </Button>
+          />
           <Button
             inverted
             color="blue"
@@ -96,6 +128,12 @@ class App extends Component {
           >
             AI
           </Button>
+          <Settings
+            player={player}
+            colour={colour}
+            changeColour={this.changeColour}
+            changePlayer={this.changePlayer}
+          />
         </Segment>
         <Segment vertical className={ai ? "" : "hidden"}>
           <Button.Group>
