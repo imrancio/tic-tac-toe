@@ -2,8 +2,11 @@ import React from "react";
 import { Button, Popup, Grid, Segment } from "semantic-ui-react";
 
 const popupStyle = {
-  opacity: 0.9,
-  padding: "0.25em"
+  opacity: 0.9
+};
+
+const gridStyle = {
+  maxWidth: "24rem"
 };
 
 const colours = ["red", "blue", "green", "orange", "violet", "teal"];
@@ -15,9 +18,9 @@ const Settings = ({ player, colour, changeColour, changePlayer }) => (
     hoverable
     inverted
     style={popupStyle}
-    size="small"
+    position="top right"
   >
-    <Grid divided inverted>
+    <Grid divided inverted style={gridStyle}>
       <Grid.Row
         columns={2}
         verticalAlign="middle"
