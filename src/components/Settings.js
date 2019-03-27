@@ -40,8 +40,9 @@ const Settings = ({ player, colour, changeColour, changePlayer }) => (
         </Grid.Column>
         <Grid.Column width={10}>
           <Segment color="black" inverted>
-            {colours.map(c => (
+            {colours.map((c, i) => (
               <Button
+                key={i}
                 inverted
                 circular
                 color={c}
