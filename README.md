@@ -1,4 +1,4 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app). A live preview is hosted at [Heroku](https://obscure-peak-40126.herokuapp.com/).
 
 ## Available Scripts
 
